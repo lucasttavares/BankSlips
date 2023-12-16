@@ -1,21 +1,35 @@
 import express from 'express';
-import {
-  getSlips,
-  postSlip,
-  getSlipsById,
-  cancelSlip,
-  paySlip,
-} from '../controllers/bankSlipsController';
+import BankSlipsController from '../controllers/bankSlipsController';
 import AuthController from '../controllers/authController';
 import AuthMiddleware from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
 router.post('/auth', AuthController.singIn);
-router.post('/bankslips', AuthMiddleware.routeFilter, postSlip);
-router.get('/bankslips', AuthMiddleware.routeFilter, getSlips);
-router.get('/bankslips/:id', AuthMiddleware.routeFilter, getSlipsById);
-router.post('/bankslips/:id/payments', AuthMiddleware.routeFilter, paySlip);
-router.delete('/bankslips/:id', AuthMiddleware.routeFilter, cancelSlip);
+router.post(
+  '/bankslips',
+  AuthMiddleware.routeFilter,
+  BankSlipsController.postSlip,
+);
+router.get(
+  '/bankslips',
+  AuthMiddleware.routeFilter,
+  BankSlipsController.getSlips,
+);
+router.get(
+  '/bankslips/:id',
+  AuthMiddleware.routeFilter,
+  BankSlipsController.getSlipsById,
+);
+router.post(
+  '/bankslips/:id/payments',
+  AuthMiddleware.routeFilter,
+  BankSlipsController.paySlip,
+);
+router.delete(
+  '/bankslips/:id',
+  AuthMiddleware.routeFilter,
+  BankSlipsController.cancelSlip,
+);
 
 module.exports = (app: any) => app.use('/rest', router);

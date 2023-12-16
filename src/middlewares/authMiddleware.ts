@@ -1,4 +1,4 @@
-import TokenManipulator from '../utils/functions/tokenManipulator';
+import TokenManipulator from '../utils/tokenManipulator';
 import { Request, Response, NextFunction } from 'express';
 
 export default class AuthMiddleware {
