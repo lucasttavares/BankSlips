@@ -32,4 +32,4 @@ router.delete(
   BankSlipsController.cancelSlip,
 );
 
-module.exports = (app: any) => app.use('/rest', router);
+export default router;
