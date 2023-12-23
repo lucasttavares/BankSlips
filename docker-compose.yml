@@ -11,6 +11,22 @@ services:
       MYSQL_ROOT_USER: 'root'
       MYSQL_ROOT_PASSWORD: 'root-pw'
     ports:
-      - 3306:3306
+      - '3306:3306'
     expose:
       - 3306
+
+  api_bankslips:
+    container_name: api_bankslips
+    image: lucasttavares/api_bankslips
+    environment:
+      PORT: 8080
+      TOKEN_KEY: ZNG_vsEZiHl8teDpokN_bw
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: root-pw
+      DB_NAME: bankslips
+      DB_PORT: 3306
+    ports:
+      - '8080:8080'
+    links:
+      - mysql
