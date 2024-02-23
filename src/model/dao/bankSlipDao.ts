@@ -1,12 +1,18 @@
 import db from '../../model/connection/connection';
-import { BoletosI } from '../../utils/types';
 
 export default class BankSlipDao {
+  public id: string;
+  public due_date: Date;
+  public total_in_cents: number;
+  public customer: string;
+  public status: string;
+  public payment_date: Date;
+
   public static async findAll() {
     return await db('slips').select('*');
   }
 
-  public static async add(slip: BoletosI, id: string) {
+  public static async add(slip: BankSlipDao, id: string) {
     return await db('slips').insert({ ...slip, id: id });
   }
 
@@ -18,7 +24,7 @@ export default class BankSlipDao {
     return await db('slips').where({ id: id }).update({ status: status });
   }
 
-  public static async findAdnPay(
+  public static async findAndPay(
     id: string,
     status: string,
     payment_date: Date,

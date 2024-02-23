@@ -1,6 +1,6 @@
 import BankSlipController from '../controllers/bankSlipsController';
 import BankSlipDao from '../model/dao/bankSlipDao';
-import BanckSlipsServices from '../services/bankSlipsServices';
+import BankSlipsServices from '../services/bankSlipsServices';
 import FineCalculatorService from '../services/fineCaulculator';
 
 jest.mock('../model/dao/bankSlipDao');
@@ -26,8 +26,8 @@ describe('BankSlip Controller', () => {
     };
     await BankSlipController.postSlip(request, response);
 
-    expect(BanckSlipsServices.save).toHaveBeenCalledTimes(1);
-    expect(BanckSlipsServices.save).toHaveBeenCalledWith({
+    expect(BankSlipsServices.save).toHaveBeenCalledTimes(1);
+    expect(BankSlipsServices.save).toHaveBeenCalledWith({
       due_date: '2023-12-01',
       total_in_cents: 100,
       customer: 'test',
@@ -130,8 +130,8 @@ describe('BankSlip Controller', () => {
     };
     await BankSlipController.paySlip(request, response);
 
-    expect(BanckSlipsServices.pay).toHaveBeenCalledTimes(1);
-    expect(BanckSlipsServices.pay).toHaveBeenCalledWith('test', {
+    expect(BankSlipsServices.pay).toHaveBeenCalledTimes(1);
+    expect(BankSlipsServices.pay).toHaveBeenCalledWith('test', {
       payment_date: '2023-12-01',
     });
     expect(response.status).toHaveBeenCalledWith(204);
@@ -167,7 +167,7 @@ describe('BankSlip Controller', () => {
 
     await BankSlipController.cancelSlip(request, response);
 
-    expect(BanckSlipsServices.cancel).toHaveBeenCalledTimes(1);
+    expect(BankSlipsServices.cancel).toHaveBeenCalledTimes(1);
     expect(response.status).toHaveBeenCalledWith(200);
   });
 

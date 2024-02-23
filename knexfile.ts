@@ -13,7 +13,7 @@ const config = {
     database: process.env.DB_NAME,
   },
   migrations: {
-    directory: `${__dirname}/src/model/migrations`,
+    directory: './migrations',
     extension: 'ts',
   },
 

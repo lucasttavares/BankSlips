@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import BankSlipDao from '../model/dao/bankSlipDao';
 import FineCalculatorService from '../services/fineCaulculator';
-import BanckSlipsServices from '../services/bankSlipsServices';
+import BankSlipsServices from '../services/bankSlipsServices';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
 
 export default class BankSlipController {
@@ -10,9 +10,9 @@ export default class BankSlipController {
     try {
       return response
         .status(HttpStatusCode.CREATED)
-        .send(await BanckSlipsServices.save(slip));
+        .send(await BankSlipsServices.save(slip));
     } catch (err: any) {
-      return response.status(err.status).send(err.message);
+      return response.status(err.status).send({ error: err.message });
     }
   }
 
@@ -38,7 +38,7 @@ export default class BankSlipController {
     const slip = request.body;
 
     try {
-      BanckSlipsServices.pay(id, slip);
+      BankSlipsServices.pay(id, slip);
       return response.status(HttpStatusCode.NO_CONTENT).send();
     } catch (err: any) {
       return response.status(err.status).send(err.message);
@@ -50,7 +50,7 @@ export default class BankSlipController {
     try {
       return response
         .status(HttpStatusCode.OK)
-        .send(await BanckSlipsServices.cancel(id));
+        .send(await BankSlipsServices.cancel(id));
     } catch (err: any) {
       return response.status(err.status).send(err.message);
     }

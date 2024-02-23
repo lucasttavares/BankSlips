@@ -21,7 +21,7 @@ describe('Auth Controller', () => {
 
     expect(TokenManipulator.generateToken).toHaveBeenCalledTimes(1);
     expect(TokenManipulator.generateToken).toHaveBeenCalledWith('test');
-    expect(response.status).toHaveBeenCalledWith(200);
+    expect(response.status).toHaveBeenCalledWith(201);
   });
 
   test('POST AuthUser Error', () => {
@@ -37,6 +37,8 @@ describe('Auth Controller', () => {
     authcontroller.singIn(request, response);
 
     expect(response.status).toHaveBeenCalledWith(500);
-    expect(response.send).toHaveBeenCalledWith('Failed to generate token');
+    expect(response.send).toHaveBeenCalledWith({
+      error: 'Failed to generate token',
+    });
   });
 });
