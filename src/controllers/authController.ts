@@ -1,19 +1,31 @@
 import { Request, Response } from 'express';
-import TokenManipulator from '../utils/tokenManipulator';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
+import AdminDao from '../model/dao/adminDao';
+import AdminServices from '../services/adminServices';
 
 export default class AuthController {
-  public static singIn(request: Request, response: Response) {
-    const { user } = request.body;
-
-    if (user === '') {
-      return response
-        .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-        .send({ error: 'Failed to generate token' });
+  public static async register(request: Request, response: Response) {
+    const admin = request.body;
+    try {
+      return response.status(HttpStatusCode.OK).send(await AdminDao.add(admin));
+    } catch (error) {
+      return response.status(HttpStatusCode.BAD_REQUEST).send(error);
     }
+  }
 
-    return response
-      .status(HttpStatusCode.CREATED)
-      .send({ token: `Bearer ${TokenManipulator.generateToken(user)}` });
+  public static async singIn(request: Request, response: Response) {
+    const admin = request.body;
+    try {
+      return response
+        .status(HttpStatusCode.OK)
+        .send(
+          await AdminServices.verifyAdminCredentials(
+            admin.email,
+            admin.password,
+          ),
+        );
+    } catch (error: any) {
+      return response.status(error.status).send(error.message);
+    }
   }
 }
