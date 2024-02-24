@@ -1,17 +1,18 @@
-import BankSlipDao from '../model/dao/bankSlipDao';
+import BankSlipsDao from '../model/dao/bankSlipsDao';
 import { v4 as uuidv4 } from 'uuid';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
+import AdminDao from '../model/dao/adminDao';
+import TokenManipulator from '../utils/tokenManipulator';
 
 export default class BankSlipsServices {
-  public static async save(slip: BankSlipDao) {
+  public static async save(slip: BankSlipsDao) {
     try {
       if (Object.keys(slip).length === 0) {
         throw {
           status: HttpStatusCode.BAD_REQUEST,
-          message: 'Bankslip not provided in the request body',
+          message: { error: 'Bankslip not provided in the request body' },
         };
       }
-
       if (
         slip.total_in_cents === null ||
         slip.due_date === null ||
@@ -22,23 +23,24 @@ export default class BankSlipsServices {
       ) {
         throw {
           status: HttpStatusCode.UNPROCESSABLE_ENTITY,
-          message:
-            'Invalid bankslip provided. The possible reasons are: A field of the provided bankslip was null or with invalid values',
+          message: {
+            error:
+              'Invalid bankslip provided. The possible reasons are: A field of the provided bankslip was null or with invalid values',
+          },
         };
       }
 
       const uuid = uuidv4();
-
-      await BankSlipDao.add(slip, uuid);
-      return await BankSlipDao.findById(uuid);
+      await BankSlipsDao.add(slip, uuid);
+      return await BankSlipsDao.findById(uuid);
     } catch (err) {
       throw err;
     }
   }
 
-  public static async pay(id: string, slip: BankSlipDao) {
+  public static async pay(id: string, slip: BankSlipsDao) {
     try {
-      const paydedSlip = await BankSlipDao.findAndPay(
+      const paydedSlip = await BankSlipsDao.findAndPay(
         id,
         'PAID',
         slip.payment_date,
@@ -46,7 +48,7 @@ export default class BankSlipsServices {
       if (paydedSlip === 0) {
         throw {
           status: HttpStatusCode.NOT_FOUND,
-          message: 'Bankslip not found with the specified id',
+          message: { error: 'Bankslip not found with the specified id' },
         };
       }
       return true;
@@ -57,15 +59,15 @@ export default class BankSlipsServices {
 
   public static async cancel(id: string) {
     try {
-      const canceledSlip = await BankSlipDao.findAndCancel(id, 'CANCELED');
+      const canceledSlip = await BankSlipsDao.findAndCancel(id, 'CANCELED');
 
       if (canceledSlip === 0) {
         throw {
           status: HttpStatusCode.BAD_REQUEST,
-          message: 'Bankslip not found with the specified id',
+          message: { error: 'Bankslip not found with the specified id' },
         };
       }
-      return 'Bankslip canceled';
+      return { message: 'Bankslip canceled' };
     } catch (err) {
       throw err;
     }
