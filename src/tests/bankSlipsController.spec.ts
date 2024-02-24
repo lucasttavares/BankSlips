@@ -1,11 +1,11 @@
 import BankSlipController from '../controllers/bankSlipsController';
-import BankSlipDao from '../model/dao/bankSlipDao';
+import BankSlipsDao from '../model/dao/bankSlipsDao';
 import BankSlipsServices from '../services/bankSlipsServices';
-import FineCalculatorService from '../services/fineCaulculator';
+import FineCalculatorServices from '../services/fineCaulculatorServices';
 
-jest.mock('../model/dao/bankSlipDao');
+jest.mock('../model/dao/bankSlipsDao');
 jest.mock('../services/bankSlipsServices');
-jest.mock('../services/fineCaulculator');
+jest.mock('../services/fineCaulculatorServices');
 
 describe('BankSlip Controller', () => {
   beforeEach(() => {
@@ -83,7 +83,7 @@ describe('BankSlip Controller', () => {
     };
     await BankSlipController.getSlips(request, response);
 
-    expect(BankSlipDao.findAll).toHaveBeenCalledTimes(1);
+    expect(BankSlipsDao.findAll).toHaveBeenCalledTimes(1);
     expect(response.status).toHaveBeenCalledWith(200);
   });
 
@@ -97,7 +97,7 @@ describe('BankSlip Controller', () => {
     };
     await BankSlipController.getSlipsById(request, response);
 
-    expect(FineCalculatorService.fineCalculator).toHaveBeenCalledTimes(1);
+    expect(FineCalculatorServices.fineCalculator).toHaveBeenCalledTimes(1);
     expect(response.status).toHaveBeenCalledWith(200);
   });
 
