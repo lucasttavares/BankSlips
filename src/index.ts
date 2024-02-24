@@ -1,5 +1,6 @@
 import express from 'express';
-import router from './routes/bankslips.routes';
+import adminRouter from './routes/admin.routes';
+import bankSlipsRouter from './routes/bankslips.routes';
 import cors from 'cors';
 import 'dotenv/config';
 import swaggerUi from 'swagger-ui-express';
@@ -7,7 +8,8 @@ import swaggerDocs from './swagger.json';
 
 const app = express();
 app.use(express.json());
-app.use('/rest', router);
+app.use('/admin', adminRouter);
+app.use('/rest', bankSlipsRouter);
 app.use(cors());
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
