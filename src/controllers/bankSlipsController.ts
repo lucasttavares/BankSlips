@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import BankSlipsDao from '../model/dao/bankSlipsDao';
-import FineCalculatorServices from '../services/fineCaulculatorServices';
+import BankSlipDao from '../model/dao/bankSlipDao';
+import FineCalculatorService from '../services/fineCaulculator';
 import BankSlipsServices from '../services/bankSlipsServices';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
 
@@ -17,9 +17,7 @@ export default class BankSlipController {
   }
 
   public static async getSlips(request: Request, response: Response) {
-    return response
-      .status(HttpStatusCode.OK)
-      .send(await BankSlipsDao.findAll());
+    return response.status(HttpStatusCode.OK).send(await BankSlipDao.findAll());
   }
 
   public static async getSlipsById(request: Request, response: Response) {
@@ -27,7 +25,7 @@ export default class BankSlipController {
     try {
       return response
         .status(HttpStatusCode.OK)
-        .send(await FineCalculatorServices.fineCalculator(id));
+        .send(await FineCalculatorService.fineCalculator(id));
     } catch (err) {
       return response
         .status(HttpStatusCode.NOT_FOUND)

@@ -1,9 +1,11 @@
 import express from 'express';
 import BankSlipsController from '../controllers/bankSlipsController';
+import AuthController from '../controllers/authController';
 import AuthMiddleware from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
+router.post('/auth', AuthController.singIn);
 router.post(
   '/bankslips',
   AuthMiddleware.routeFilter,
