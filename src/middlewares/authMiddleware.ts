@@ -8,19 +8,22 @@ export default class AuthMiddleware {
     response: Response,
     next: NextFunction,
   ): void | Response {
-    const { authorization }: any = request.headers;
+    const { authorization } = request.headers;
 
-    if (authorization === undefined) {
+    if (!authorization) {
       return response
         .status(HttpStatusCode.NOT_FOUND)
         .send({ error: 'Token not found' });
-    } else {
-      const token = authorization.split(' ')[1];
-      return TokenManipulator.validateToken(token)
-        ? next()
-        : response
-            .status(HttpStatusCode.BAD_REQUEST)
-            .send({ error: 'Invalid token' });
     }
+
+    const token = authorization.split(' ')[1];
+
+    if (TokenManipulator.validateToken(token)) {
+      return next();
+    }
+
+    return response
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send({ error: 'Invalid token' });
   }
 }
