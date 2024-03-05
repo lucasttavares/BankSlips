@@ -1,6 +1,7 @@
 import AuthController from '../controllers/authController';
 import AdminDao from '../model/dao/adminDao';
 import AdminServices from '../services/adminServices';
+import TokenManipulator from '../utils/tokenManipulator';
 
 jest.mock('../model/dao/adminDao');
 jest.mock('../services/adminServices');
@@ -100,5 +101,26 @@ describe('Auth Controller', () => {
       expect(error.status).toBe(404);
       expect(error.message).toEqual({ error: 'Invalid password' });
     }
+  });
+
+  test('Refresh Token', async () => {
+    const request: any = {
+      headers: {
+        authorization:
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      },
+    };
+
+    const response: any = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+
+    TokenManipulator.generateToken = jest.fn().mockReturnValue('newToken');
+    await AuthController.refreshToken(request, response);
+
+    expect(TokenManipulator.generateToken).toHaveBeenCalledTimes(1);
+    expect(response.status).toHaveBeenCalledWith(200);
+    expect(response.send).toHaveBeenCalledWith({ token: 'newToken' });
   });
 });
