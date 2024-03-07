@@ -6,11 +6,14 @@
 
 Este projeto consiste em uma API REST responsável por gerar e gerenciar boletos, visando execução de cinco endpoints:
 
-- Criar boleto - POST localhost:8080/rest/bankslips
-- Listar boletos - GET localhost:8080/rest/bankslips
-- Ver detalhes - GET localhost:8080/rest/bankslips/{id}
-- Pagar um boleto - POST localhost:8080/rest/bankslips/{id}/payments
-- Cancelar um boleto - DELETE localhost:8080/rest/bankslips/{id}
+- Registrar administrador - `POST` localhost:8080/admin/register
+- Autenticar administrador - `POST` localhost:8080/admin/auth
+- Gerar novo token de administrador - `POST` localhost:8080/admin/refresh-token
+- Criar boleto - `POST` localhost:8080/rest/bankslips
+- Listar boletos - `GET` localhost:8080/rest/bankslips
+- Ver detalhes - `GET` localhost:8080/rest/bankslips/{id}
+- Pagar um boleto - `POST` localhost:8080/rest/bankslips/{id}/payments
+- Cancelar um boleto - `DELETE` localhost:8080/rest/bankslips/{id}
 
 ## Tecnologias utilizadas:
 
