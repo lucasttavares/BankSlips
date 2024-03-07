@@ -41,17 +41,36 @@ DB_PORT=3306
 
 4. Instale os pacotes com o comando `npm install`
 
-5. Execute o comando `sudo docker compose up` na pasta do projeto
+5. Execute o comando `docker compose up` na pasta do projeto
 
 6. Crie uma conexão no Gerenciador de Bancos de Dados de sua preferência com as informações necessárias dispostas no `.env`
 
 ## Exemplos de requisições
 
+### Registrar Administrador
+
+```
+{
+ "email": "admin@admin.com",
+ "user": "admin",
+ "password": "123456"
+}
+```
+
+### Autenticar Administrador
+
+```
+{
+ "email": "admin@admin.com",
+ "password": "123456"
+}
+```
+
 ### Criar Boleto
 
 ```
 {
- "due_date":"2023-12-01",
+ "due_date":"2023-12-05",
  "total_in_cents":"10000",
  "customer":"Trillian Company"
 }
@@ -61,15 +80,15 @@ DB_PORT=3306
 
 ```
 {
- "payment_date":"2018-06-30"
+ "payment_date":"2023-12-01"
 }
 ```
 
 ## Dokcer
 
-As imagens Docker estão disponiveis e podem ser obtidas através do comandos `docker pull mysql` e `docker pull lucasttavares/api_bankslips`.
+A imagem Docker do `MySQL` pode ser instalada manualmente através do comando `docker pull mysql`.
 
-Crie um arquivo `docker-compose.yml` com os seguintes parâmetros, seguindo as configurações do seu `.env` (altere os campos que julgar necessário):
+Altere o arquivo `docker-compose.yml` seguindo as configurações do seu `.env` (altere os campos que julgar necessário):
 
 ```
 version: '3.3'
@@ -88,21 +107,5 @@ services:
       - '3306:3306'
     expose:
       - 3306
-
-  api_bankslips:
-    container_name: api_bankslips
-    image: lucasttavares/api_bankslips
-    environment:
-      PORT: 8080
-      TOKEN_KEY: ZNG_vsEZiHl8teDpokN_bw
-      DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: root-pw
-      DB_NAME: bankslips
-      DB_PORT: 3306
-    ports:
-      - '8080:8080'
-    links:
-      - mysql
 
 ```
