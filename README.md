@@ -26,11 +26,9 @@ Este projeto consiste em uma API REST responsável por gerar e gerenciar boletos
 
 ## Como executar
 
-1. Clone o repositório e acesse a pasta do projeto
+1. Clone o repositório e acesse a pasta do projeto.
 
-2. Configure a conexão da sua imagem Docker
-
-3. Crie um aquivo `.env` na raiz do projeto com a seguinte estrutura
+2. Crie um aquivo `.env` na raiz do projeto com a seguinte estrutura.
 
 ```
 PORT=8080
@@ -42,11 +40,17 @@ DB_NAME=bankslips
 DB_PORT=3306
 ```
 
-4. Instale os pacotes com o comando `npm install`
+3. Instale os pacotes com o comando `npm install`.
 
-5. Execute o comando `docker compose up` na pasta do projeto
+4. Configure a conexão do serviço Docker. *Caso não tenha feito, veja como na seção Docker*.
 
-6. Crie uma conexão no Gerenciador de Bancos de Dados de sua preferência com as informações necessárias dispostas no `.env`
+5. Execute o comando `docker compose up` na pasta do projeto.
+
+6. Crie uma conexão no Gerenciador de Bancos de Dados de sua preferência com as informações necessárias, dispostas no `.env`.
+
+8. Execute o comando `npm knex migrate:latest` para criar as tabelas do seu banco de dados.
+
+9. Inicie a execução com o comando `npm start`.
 
 ## Exemplos de requisições
 
