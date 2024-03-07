@@ -3,6 +3,7 @@ import HttpStatusCode from '../utils/enum/httpStatusCode';
 import AdminDao from '../model/dao/adminDao';
 import AdminServices from '../services/adminServices';
 import TokenManipulator from '../utils/tokenManipulator';
+import { base64ToString } from '../utils/base64ToString';
 
 export default class AuthController {
   public static async register(request: Request, response: Response) {
@@ -32,14 +33,12 @@ export default class AuthController {
 
   public static async refreshToken(request: Request, response: Response) {
     const { authorization } = request.headers;
-    const token = String(authorization);
-    const admin = JSON.parse(
-      Buffer.from(token.split('.')[1], 'base64').toString(),
-    );
+    const admin = JSON.parse(base64ToString(authorization!.split('.')[1]));
+
     try {
       return response
         .status(HttpStatusCode.OK)
-        .send({ token: TokenManipulator.generateToken(admin) });
+        .send({ token: TokenManipulator.generateToken(admin.user) });
     } catch (error) {
       return response.status(HttpStatusCode.BAD_REQUEST).send(error);
     }
