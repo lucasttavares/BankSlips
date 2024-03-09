@@ -1,7 +1,7 @@
-import AuthController from '../controllers/authController';
-import AdminDao from '../model/dao/adminDao';
-import AdminServices from '../services/adminServices';
-import TokenManipulator from '../utils/tokenManipulator';
+import AuthController from '../../src/controllers/authController';
+import AdminRepository from '../../src/database/AdminRepository';
+import AdminServices from '../../src/services/adminServices';
+import TokenManipulator from '../../src/utils/tokenManipulator';
 
 jest.mock('../model/dao/adminDao');
 jest.mock('../services/adminServices');
@@ -28,8 +28,8 @@ describe('Auth Controller', () => {
 
     await AuthController.register(request, response);
 
-    expect(AdminDao.add).toHaveBeenCalledTimes(1);
-    expect(AdminDao.add).toHaveBeenCalledWith({
+    expect(AdminRepository.add).toHaveBeenCalledTimes(1);
+    expect(AdminRepository.add).toHaveBeenCalledWith({
       email: 'admin@admin.com',
       user: 'admin',
       password: '123',

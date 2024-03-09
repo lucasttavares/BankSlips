@@ -1,5 +1,5 @@
-import BankSlipsDao from '../model/dao/bankSlipsDao';
-import FineCalculatorServices from '../services/fineCaulculatorServices';
+import BankSlips from '../../src/model/BankSlips';
+import BankSlipsServices from '../../src/services/BankSlipsServices';
 
 describe('Fine Calculator', () => {
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('Fine Calculator', () => {
     const epochValue = 86400000;
     const countDays = (insertedDate - dueDate) / epochValue;
 
-    const fine = FineCalculatorServices.calculate(slip, insertedDate, dueDate);
+    const fine = BankSlipsServices.calculate(slip, insertedDate, dueDate);
 
     const expectFine = slip.total_in_cents * countDays * (0.5 / 100);
 
@@ -33,7 +33,7 @@ describe('Fine Calculator', () => {
     const epochValue = 86400000;
     const countDays = (insertedDate - dueDate) / epochValue;
 
-    const fine = FineCalculatorServices.calculate(slip, insertedDate, dueDate);
+    const fine = BankSlipsServices.calculate(slip, insertedDate, dueDate);
 
     const expectFine = slip.total_in_cents * countDays * (1 / 100);
 
@@ -48,7 +48,7 @@ describe('Fine Calculator', () => {
     const insertedDate = new Date('2024-02-01').getTime();
     const dueDate = new Date('2024-02-01').getTime();
 
-    const fine = FineCalculatorServices.calculate(slip, insertedDate, dueDate);
+    const fine = BankSlipsServices.calculate(slip, insertedDate, dueDate);
 
     expect(fine).toBe(0);
   });
@@ -60,16 +60,16 @@ describe('Fine Calculator', () => {
       due_date: '2024-02-01',
     };
 
-    jest.spyOn(BankSlipsDao, 'findById').mockResolvedValue(slip);
+    jest.spyOn(BankSlips, 'findById').mockResolvedValue(slip);
 
     const currentDate = new Date().getTime();
     const dueDate = new Date(slip.due_date).getTime();
-    const fine = FineCalculatorServices.calculate(slip, currentDate, dueDate);
+    const fine = BankSlipsServices.calculate(slip, currentDate, dueDate);
 
-    const result = await FineCalculatorServices.fineCalculator(slip.id);
+    const result = await BankSlipsServices.fineCalculator(slip.id);
 
-    expect(BankSlipsDao.findById).toHaveBeenCalledTimes(1);
-    expect(BankSlipsDao.findById).toHaveBeenCalledWith(slip.id);
+    expect(BankSlips.findById).toHaveBeenCalledTimes(1);
+    expect(BankSlips.findById).toHaveBeenCalledWith(slip.id);
     expect(result).toEqual({ ...slip, fine: fine });
   });
 
@@ -81,16 +81,16 @@ describe('Fine Calculator', () => {
       due_date: '2024-02-01',
     };
 
-    jest.spyOn(BankSlipsDao, 'findById').mockResolvedValue(slip);
+    jest.spyOn(BankSlips, 'findById').mockResolvedValue(slip);
 
     const paymentDate = new Date(slip.payment_date).getTime();
     const dueDate = new Date(slip.due_date).getTime();
-    const fine = FineCalculatorServices.calculate(slip, paymentDate, dueDate);
+    const fine = BankSlipsServices.calculate(slip, paymentDate, dueDate);
 
-    const result = await FineCalculatorServices.fineCalculator(slip.id);
+    const result = await BankSlipsServices.fineCalculator(slip.id);
 
-    expect(BankSlipsDao.findById).toHaveBeenCalledTimes(1);
-    expect(BankSlipsDao.findById).toHaveBeenCalledWith(slip.id);
+    expect(BankSlips.findById).toHaveBeenCalledTimes(1);
+    expect(BankSlips.findById).toHaveBeenCalledWith(slip.id);
     expect(result).toEqual({ ...slip, fine: fine });
   });
 
@@ -101,12 +101,12 @@ describe('Fine Calculator', () => {
       due_date: '2024-02-01',
     };
 
-    jest.spyOn(BankSlipsDao, 'findById').mockResolvedValueOnce(slip);
+    jest.spyOn(BankSlips, 'findById').mockResolvedValueOnce(slip);
 
-    const result = await FineCalculatorServices.fineCalculator(slip.id);
+    const result = await BankSlipsServices.fineCalculator(slip.id);
 
-    expect(BankSlipsDao.findById).toHaveBeenCalledTimes(1);
-    expect(BankSlipsDao.findById).toHaveBeenCalledWith(slip.id);
+    expect(BankSlips.findById).toHaveBeenCalledTimes(1);
+    expect(BankSlips.findById).toHaveBeenCalledWith(slip.id);
     expect(result).toEqual(slip);
   });
 });

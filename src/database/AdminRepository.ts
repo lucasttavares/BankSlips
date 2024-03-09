@@ -1,11 +1,11 @@
-import db from '../connection/connection';
+import db from '../infra/connection';
 
-export default class AdminDao {
+export default class AdminRepository {
   public email: string;
   public user: string;
   public password: string;
 
-  public static async add(admin: AdminDao) {
+  public static async add(admin: AdminRepository) {
     return await db('admin').insert(admin);
   }
 

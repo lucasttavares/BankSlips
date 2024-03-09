@@ -1,25 +1,72 @@
-import BankSlipsDao from '../model/dao/bankSlipsDao';
 import { v4 as uuidv4 } from 'uuid';
+import BankSlipsRepository from '../database/BankSlipsRepository';
+import BankSlips from '../model/BankSlips';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
-import AdminDao from '../model/dao/adminDao';
-import TokenManipulator from '../utils/tokenManipulator';
 
 export default class BankSlipsServices {
-  public static async save(slip: BankSlipsDao) {
+  private repository: BankSlipsRepository;
+
+  constructor() {
+    this.repository = new BankSlipsRepository();
+  }
+
+  public calculate(slip: any, insertedDate: number, dueDate: number) {
+    const epochValue = 86400000;
+    const countDays = (insertedDate - dueDate) / epochValue;
+    let fine = 0;
+
+    if (insertedDate <= dueDate) {
+      return fine;
+    }
+
+    const fineRate = insertedDate <= dueDate + 10 * epochValue ? 0.5 / 100 : 1 / 100;
+    fine = slip.total_in_cents * countDays * fineRate;
+
+    return parseFloat(fine.toFixed(2));
+  }
+
+  public async fineCalculator(id: string) {
     try {
-      if (Object.keys(slip).length === 0) {
+      const slip = await this.repository.findById(id);
+      if (!slip) {
+        throw new Error(`Bankslip not found with the specified id: ${id}`);
+      }
+      const currentDate = new Date().getTime();
+      const paymentDate = slip.payment_date ? new Date(slip.payment_date).getTime() : 0;
+      const dueDate = new Date(slip.due_date).getTime();
+
+      let fineDate = currentDate;
+
+      if (slip.status === 'PAID') {
+        fineDate = paymentDate;
+      }
+
+      const fine = this.calculate(slip, fineDate, dueDate);
+      return { ...slip, fine: fine };
+
+    } catch (err) {
+      throw new Error(`Failed to calculate fine for slip with id ${id}: ${(err as Error).message}`);
+    }
+  }
+
+  public async save(slip: BankSlips) {
+    try {
+      if (!slip || Object.keys(slip).length === 0) {
         throw {
           status: HttpStatusCode.BAD_REQUEST,
           message: { error: 'Bankslip not provided in the request body' },
         };
       }
+
+      const { total_in_cents, due_date, customer } = slip;
+
       if (
-        slip.total_in_cents === null ||
-        slip.due_date === null ||
-        slip.customer === null ||
-        typeof slip.total_in_cents !== 'number' ||
-        typeof slip.due_date !== 'string' ||
-        typeof slip.customer !== 'string'
+        !total_in_cents ||
+        !due_date ||
+        !customer ||
+        typeof total_in_cents !== 'number' ||
+        typeof due_date !== 'string' ||
+        typeof customer !== 'string'
       ) {
         throw {
           status: HttpStatusCode.UNPROCESSABLE_ENTITY,
@@ -30,46 +77,49 @@ export default class BankSlipsServices {
         };
       }
 
+      if (!slip.due_date) {
+        throw new Error('Due date is missing in the slip object.');
+      }
+
       const uuid = uuidv4();
-      await BankSlipsDao.add(slip, uuid);
-      return await BankSlipsDao.findById(uuid);
+      await this.repository.add(slip, uuid);
+      return await this.repository.findById(uuid);
     } catch (err) {
       throw err;
     }
-  }
+  };
 
-  public static async pay(id: string, slip: BankSlipsDao) {
+  public async pay(id: string, slip: BankSlips) {
     try {
-      const paydedSlip = await BankSlipsDao.findAndPay(
-        id,
-        'PAID',
-        slip.payment_date,
-      );
-      if (paydedSlip === 0) {
-        throw {
-          status: HttpStatusCode.NOT_FOUND,
-          message: { error: 'Bankslip not found with the specified id' },
-        };
-      }
-      return true;
-    } catch (err) {
-      throw err;
+      const { payment_date } = slip;
+      await this.repository.pay(id, 'PAID', payment_date);
+    }
+    catch (err) {
+      throw {
+        status: HttpStatusCode.NOT_FOUND,
+        message: { error: 'Bankslip not found with the specified id' },
+      };
     }
   }
 
-  public static async cancel(id: string) {
+  public async cancel(id: string) {
     try {
-      const canceledSlip = await BankSlipsDao.findAndCancel(id, 'CANCELED');
-
-      if (canceledSlip === 0) {
-        throw {
-          status: HttpStatusCode.BAD_REQUEST,
-          message: { error: 'Bankslip not found with the specified id' },
-        };
-      }
-      return { message: 'Bankslip canceled' };
+      await this.repository.updateStatus(id, 'CANCELED');
     } catch (err) {
-      throw err;
+      throw {
+        status: HttpStatusCode.BAD_REQUEST,
+        message: { error: 'Bankslip not found with the specified id' },
+      };
     }
   }
+
+  public async findAll() {
+    try {
+      const slips = await this.repository.findAll();
+      return slips;
+    } catch (err) {
+      throw new Error(`Failed to fetch all slips: ${(err as Error).message}`);
+    }
+  }
+
 }

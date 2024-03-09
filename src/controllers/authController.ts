@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
-import AdminDao from '../model/dao/adminDao';
+import AdminRepository from '../database/AdminRepository';
 import AdminServices from '../services/adminServices';
 import TokenManipulator from '../utils/tokenManipulator';
 import { base64ToString } from '../utils/base64ToString';
@@ -9,7 +9,7 @@ export default class AuthController {
   public static async register(request: Request, response: Response) {
     const admin = request.body;
     try {
-      return response.status(HttpStatusCode.OK).send(await AdminDao.add(admin));
+      return response.status(HttpStatusCode.OK).send(await AdminRepository.add(admin));
     } catch (error) {
       return response.status(HttpStatusCode.BAD_REQUEST).send(error);
     }

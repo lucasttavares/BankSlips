@@ -1,10 +1,10 @@
 import HttpStatusCode from '../utils/enum/httpStatusCode';
-import AdminDao from '../model/dao/adminDao';
+import AdminRepository from '../database/AdminRepository';
 import TokenManipulator from '../utils/tokenManipulator';
 
 export default class AdminServices {
   public static async verifyAdminCredentials(email: string, password: string) {
-    const admin: AdminDao[] = await AdminDao.findByEmail(email);
+    const admin: AdminRepository[] = await AdminRepository.findByEmail(email);
     if (admin.length === 0) {
       throw {
         status: HttpStatusCode.NOT_FOUND,

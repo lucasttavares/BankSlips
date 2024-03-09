@@ -1,6 +1,6 @@
-import BankSlipsServices from '../services/bankSlipsServices';
-import BankSlipsDao from '../model/dao/bankSlipsDao';
 import { v4 as uuidv4 } from 'uuid';
+import BankSlips from '../../src/model/BankSlips';
+import BankSlipsServices from '../../src/services/bankSlipsServices';
 
 jest.mock('../model/dao/bankSlipsDao');
 jest.mock('uuid', () => ({
@@ -24,9 +24,9 @@ describe('BankSlips Services', () => {
 
     await BankSlipsServices.save(slip);
 
-    expect(BankSlipsDao.add).toHaveBeenCalledTimes(1);
-    expect(BankSlipsDao.add).toHaveBeenCalledWith(slip, id);
-    expect(BankSlipsDao.findById).toHaveBeenCalledWith(id);
+    expect(BankSlips.add).toHaveBeenCalledTimes(1);
+    expect(BankSlips.add).toHaveBeenCalledWith(slip, id);
+    expect(BankSlips.findById).toHaveBeenCalledWith(id);
   });
 
   test('BankSlips Services Error empty data', async () => {
@@ -68,8 +68,8 @@ describe('BankSlips Services', () => {
 
     const result = await BankSlipsServices.pay(id, slip);
 
-    expect(BankSlipsDao.findAndPay).toHaveBeenCalledTimes(1);
-    expect(BankSlipsDao.findAndPay).toHaveBeenCalledWith(
+    expect(BankSlips.findAndPay).toHaveBeenCalledTimes(1);
+    expect(BankSlips.findAndPay).toHaveBeenCalledWith(
       id,
       'PAID',
       slip.payment_date,
@@ -81,7 +81,7 @@ describe('BankSlips Services', () => {
     const id = '';
     const slip: any = {};
 
-    (BankSlipsDao.findAndPay as jest.Mock).mockResolvedValueOnce(0);
+    (BankSlips.findAndPay as jest.Mock).mockResolvedValueOnce(0);
 
     try {
       await BankSlipsServices.pay(id, slip);
@@ -97,15 +97,15 @@ describe('BankSlips Services', () => {
     const id = '7954f4b0-7ce9-424e-93fd-83c71eea3bc7';
     const result = await BankSlipsServices.cancel(id);
 
-    expect(BankSlipsDao.findAndCancel).toHaveBeenCalledTimes(1);
-    expect(BankSlipsDao.findAndCancel).toHaveBeenCalledWith(id, 'CANCELED');
+    expect(BankSlips.findAndCancel).toHaveBeenCalledTimes(1);
+    expect(BankSlips.findAndCancel).toHaveBeenCalledWith(id, 'CANCELED');
     expect(result).toEqual({ message: 'Bankslip canceled' });
   });
 
   test('Cancel Slip Error not found', async () => {
     const id = '';
 
-    (BankSlipsDao.findAndCancel as jest.Mock).mockResolvedValueOnce(0);
+    (BankSlips.findAndCancel as jest.Mock).mockResolvedValueOnce(0);
 
     try {
       await BankSlipsServices.cancel(id);

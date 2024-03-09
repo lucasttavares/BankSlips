@@ -1,4 +1,4 @@
-import { base64ToString } from '../utils/base64ToString';
+import { base64ToString } from '../../src/utils/base64ToString';
 
 describe('Base64ToString', () => {
   test('Converter', () => {

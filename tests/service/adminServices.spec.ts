@@ -1,6 +1,6 @@
-import AdminDao from '../model/dao/adminDao';
-import AdminServices from '../services/adminServices';
-import TokenManipulator from '../utils/tokenManipulator';
+import AdminRepository from '../../src/database/AdminRepository';
+import AdminServices from '../../src/services/adminServices';
+import TokenManipulator from '../../src/utils/tokenManipulator';
 
 jest.mock('../model/dao/adminDao');
 jest.mock('../utils/tokenManipulator');
@@ -15,19 +15,19 @@ describe('Auth Controller', () => {
     const adminPassword = 'adminPassword';
     const adminData = { email: adminEmail, password: adminPassword };
 
-    AdminDao.findByEmail = jest.fn().mockResolvedValue([adminData]);
+    AdminRepository.findByEmail = jest.fn().mockResolvedValue([adminData]);
 
     const token = await AdminServices.verifyAdminCredentials(
       adminEmail,
       adminPassword,
     );
-    expect(AdminDao.findByEmail).toHaveBeenCalledTimes(1);
+    expect(AdminRepository.findByEmail).toHaveBeenCalledTimes(1);
     expect(TokenManipulator.generateToken).toHaveBeenCalledTimes(1);
     expect(token).toHaveProperty('token');
   });
 
   test('Verify Admin Credentials Error Admin not found', async () => {
-    AdminDao.findByEmail = jest.fn().mockResolvedValue([]);
+    AdminRepository.findByEmail = jest.fn().mockResolvedValue([]);
     try {
       await AdminServices.verifyAdminCredentials('test@test.com', 'test');
     } catch (error: any) {
@@ -38,7 +38,7 @@ describe('Auth Controller', () => {
 
   test('Verify Admin Credentials Error Invalid password', async () => {
     const adminEmail = 'admin@example.com';
-    AdminDao.findByEmail = jest
+    AdminRepository.findByEmail = jest
       .fn()
       .mockResolvedValue([{ email: adminEmail, password: 'correctPassword' }]);
 

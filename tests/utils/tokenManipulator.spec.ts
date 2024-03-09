@@ -1,4 +1,4 @@
-import TokenManipulator from '../utils/tokenManipulator';
+import TokenManipulator from '../../src/utils/tokenManipulator';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
