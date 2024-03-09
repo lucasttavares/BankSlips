@@ -1,6 +1,6 @@
 import express from 'express';
 import adminRouter from './routes/admin.routes';
-import bankSlipsRouter from './routes/bankslips.routes';
+import bankSlipsRouter from './routes/BankSlipsRoutes';
 import cors from 'cors';
 import 'dotenv/config';
 import swaggerUi from 'swagger-ui-express';

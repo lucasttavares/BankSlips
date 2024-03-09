@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import BankSlipsController from '../controllers/bankSlipsController';
+import BankSlipsController from '../controllers/BankSlipController';
 import AuthMiddleware from '../middlewares/authMiddleware';
 
 class BankSlipsRoutes {
