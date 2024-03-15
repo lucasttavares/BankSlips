@@ -9,7 +9,9 @@ export default class AuthController {
   public static async register(request: Request, response: Response) {
     const admin = request.body;
     try {
-      return response.status(HttpStatusCode.OK).send(await AdminRepository.add(admin));
+      return response
+        .status(HttpStatusCode.OK)
+        .send(await AdminRepository.add(admin));
     } catch (error) {
       return response.status(HttpStatusCode.BAD_REQUEST).send(error);
     }

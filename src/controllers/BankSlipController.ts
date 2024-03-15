@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import BankSlipsServices from '../services/BankSlipsServices';
+import BankSlipsServices from '../services/bankSlipsServices';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
 
 export default class BankSlipController {
