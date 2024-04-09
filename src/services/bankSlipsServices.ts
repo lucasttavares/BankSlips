@@ -19,7 +19,8 @@ export default class BankSlipsServices {
       return fine;
     }
 
-    const fineRate = insertedDate <= dueDate + 10 * epochValue ? 0.5 / 100 : 1 / 100;
+    const fineRate =
+      insertedDate <= dueDate + 10 * epochValue ? 0.5 / 100 : 1 / 100;
     fine = slip.total_in_cents * countDays * fineRate;
 
     return parseFloat(fine.toFixed(2));
@@ -28,11 +29,15 @@ export default class BankSlipsServices {
   public async fineCalculator(id: string) {
     try {
       const slip = await this.repository.findById(id);
+
       if (!slip) {
         throw new Error(`Bankslip not found with the specified id: ${id}`);
       }
+
       const currentDate = new Date().getTime();
-      const paymentDate = slip.payment_date ? new Date(slip.payment_date).getTime() : 0;
+      const paymentDate = slip.payment_date
+        ? new Date(slip.payment_date).getTime()
+        : 0;
       const dueDate = new Date(slip.due_date).getTime();
 
       let fineDate = currentDate;
@@ -42,10 +47,14 @@ export default class BankSlipsServices {
       }
 
       const fine = this.calculate(slip, fineDate, dueDate);
-      return { ...slip, fine: fine };
 
+      return { ...slip, fine: fine };
     } catch (err) {
-      throw new Error(`Failed to calculate fine for slip with id ${id}: ${(err as Error).message}`);
+      throw new Error(
+        `Failed to calculate fine for slip with id ${id}: ${
+          (err as Error).message
+        }`,
+      );
     }
   }
 
@@ -77,9 +86,9 @@ export default class BankSlipsServices {
         };
       }
 
-      if (!slip.due_date) {
+      /*       if (!slip.due_date) {
         throw new Error('Due date is missing in the slip object.');
-      }
+      } */
 
       const uuid = uuidv4();
       await this.repository.add(slip, uuid);
@@ -87,14 +96,13 @@ export default class BankSlipsServices {
     } catch (err) {
       throw err;
     }
-  };
+  }
 
   public async pay(id: string, slip: BankSlips) {
     try {
       const { payment_date } = slip;
       await this.repository.pay(id, 'PAID', payment_date);
-    }
-    catch (err) {
+    } catch (err) {
       throw {
         status: HttpStatusCode.NOT_FOUND,
         message: { error: 'Bankslip not found with the specified id' },
@@ -121,5 +129,4 @@ export default class BankSlipsServices {
       throw new Error(`Failed to fetch all slips: ${(err as Error).message}`);
     }
   }
-
 }

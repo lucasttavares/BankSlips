@@ -6,7 +6,14 @@ export default class BankSlips {
   public status?: string;
   public payment_date: Date;
 
-  constructor(due_date: Date, total_in_cents: number, customer: string, payment_date: Date, id?: string, status?: string) {
+  constructor(
+    due_date: Date,
+    total_in_cents: number,
+    customer: string,
+    payment_date: Date,
+    id?: string,
+    status?: string,
+  ) {
     this.id = id;
     this.due_date = due_date;
     this.total_in_cents = total_in_cents;

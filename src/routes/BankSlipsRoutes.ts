@@ -18,21 +18,25 @@ class BankSlipsRoutes {
       AuthMiddleware.routeFilter,
       this.bankSlipsController.postSlip,
     );
+
     this.router.get(
       '/bankslips',
       AuthMiddleware.routeFilter,
-      this.bankSlipsController.getSlips,
+      this.bankSlipsController.getSlips.bind(this.bankSlipsController),
     );
+
     this.router.get(
       '/bankslips/:id',
       AuthMiddleware.routeFilter,
       this.bankSlipsController.getSlipsById,
     );
+
     this.router.post(
       '/bankslips/:id/payments',
       AuthMiddleware.routeFilter,
       this.bankSlipsController.paySlip,
     );
+
     this.router.delete(
       '/bankslips/:id',
       AuthMiddleware.routeFilter,

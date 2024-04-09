@@ -1,5 +1,5 @@
-import BankSlips from '../../src/model/BankSlips';
-import BankSlipsServices from '../../src/services/BankSlipsServices';
+import BankSlipsRepository from '../../src/database/BankSlipsRepository';
+import BankSlipsServices from '../../src/services/bankSlipsServices';
 
 describe('Fine Calculator', () => {
   beforeEach(() => {
@@ -11,12 +11,13 @@ describe('Fine Calculator', () => {
       total_in_cents: 100,
     };
 
+    const slipService = new BankSlipsServices();
     const insertedDate = new Date('2024-02-05').getTime();
     const dueDate = new Date('2024-02-01').getTime();
     const epochValue = 86400000;
     const countDays = (insertedDate - dueDate) / epochValue;
 
-    const fine = BankSlipsServices.calculate(slip, insertedDate, dueDate);
+    const fine = slipService.calculate(slip, insertedDate, dueDate);
 
     const expectFine = slip.total_in_cents * countDays * (0.5 / 100);
 
@@ -28,12 +29,13 @@ describe('Fine Calculator', () => {
       total_in_cents: 100,
     };
 
+    const slipService = new BankSlipsServices();
     const insertedDate = new Date('2024-02-12').getTime();
     const dueDate = new Date('2024-02-01').getTime();
     const epochValue = 86400000;
     const countDays = (insertedDate - dueDate) / epochValue;
 
-    const fine = BankSlipsServices.calculate(slip, insertedDate, dueDate);
+    const fine = slipService.calculate(slip, insertedDate, dueDate);
 
     const expectFine = slip.total_in_cents * countDays * (1 / 100);
 
@@ -45,31 +47,35 @@ describe('Fine Calculator', () => {
       total_in_cents: 100,
     };
 
+    const slipService = new BankSlipsServices();
     const insertedDate = new Date('2024-02-01').getTime();
     const dueDate = new Date('2024-02-01').getTime();
 
-    const fine = BankSlipsServices.calculate(slip, insertedDate, dueDate);
+    const fine = slipService.calculate(slip, insertedDate, dueDate);
 
     expect(fine).toBe(0);
   });
 
   test('Fine Calculate with slip status Pending', async () => {
+    const id = '7954f4b0-7ce9-424e-93fd-83c71eea3bc7';
     const slip: any = {
-      id: '7954f4b0-7ce9-424e-93fd-83c71eea3bc7',
       status: 'PENDING',
       due_date: '2024-02-01',
     };
 
-    jest.spyOn(BankSlips, 'findById').mockResolvedValue(slip);
+    const slipService = new BankSlipsServices();
+    const repository = new BankSlipsRepository();
+
+    jest.spyOn(repository, 'findById').mockResolvedValue(slip);
 
     const currentDate = new Date().getTime();
     const dueDate = new Date(slip.due_date).getTime();
-    const fine = BankSlipsServices.calculate(slip, currentDate, dueDate);
+    const fine = slipService.calculate(slip, currentDate, dueDate);
 
-    const result = await BankSlipsServices.fineCalculator(slip.id);
+    const result = await slipService.fineCalculator(id);
 
-    expect(BankSlips.findById).toHaveBeenCalledTimes(1);
-    expect(BankSlips.findById).toHaveBeenCalledWith(slip.id);
+    expect(repository.findById).toHaveBeenCalledTimes(1);
+    expect(repository.findById).toHaveBeenCalledWith(id);
     expect(result).toEqual({ ...slip, fine: fine });
   });
 
@@ -81,16 +87,18 @@ describe('Fine Calculator', () => {
       due_date: '2024-02-01',
     };
 
-    jest.spyOn(BankSlips, 'findById').mockResolvedValue(slip);
+    const repository = new BankSlipsRepository();
+    jest.spyOn(repository, 'findById').mockResolvedValue(slip);
 
+    const slipService = new BankSlipsServices();
     const paymentDate = new Date(slip.payment_date).getTime();
     const dueDate = new Date(slip.due_date).getTime();
-    const fine = BankSlipsServices.calculate(slip, paymentDate, dueDate);
+    const fine = slipService.calculate(slip, paymentDate, dueDate);
 
-    const result = await BankSlipsServices.fineCalculator(slip.id);
+    const result = await slipService.fineCalculator(slip.id);
 
-    expect(BankSlips.findById).toHaveBeenCalledTimes(1);
-    expect(BankSlips.findById).toHaveBeenCalledWith(slip.id);
+    expect(repository.findById).toHaveBeenCalledTimes(1);
+    expect(repository.findById).toHaveBeenCalledWith(slip.id);
     expect(result).toEqual({ ...slip, fine: fine });
   });
 
@@ -101,12 +109,14 @@ describe('Fine Calculator', () => {
       due_date: '2024-02-01',
     };
 
-    jest.spyOn(BankSlips, 'findById').mockResolvedValueOnce(slip);
+    const repository = new BankSlipsRepository();
+    jest.spyOn(repository, 'findById').mockResolvedValueOnce(slip);
 
-    const result = await BankSlipsServices.fineCalculator(slip.id);
+    const slipService = new BankSlipsServices();
+    const result = await slipService.fineCalculator(slip.id);
 
-    expect(BankSlips.findById).toHaveBeenCalledTimes(1);
-    expect(BankSlips.findById).toHaveBeenCalledWith(slip.id);
+    expect(repository.findById).toHaveBeenCalledTimes(1);
+    expect(repository.findById).toHaveBeenCalledWith(slip.id);
     expect(result).toEqual(slip);
   });
 });

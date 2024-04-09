@@ -12,9 +12,8 @@ export default class BankSlipController {
   public async postSlip(request: Request, response: Response) {
     const slip = request.body;
     try {
-      return response
-        .status(HttpStatusCode.CREATED)
-        .send(await this.bankSlipsServices.save(slip));
+      const saved = this.bankSlipsServices.save(slip);
+      return response.status(HttpStatusCode.CREATED).send(saved);
     } catch (err: any) {
       return response.status(err.status).send({ error: err.message });
     }
