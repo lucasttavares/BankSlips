@@ -1,15 +1,14 @@
 import db from '../infra/connection';
+import Admin from '../model/Admin';
 
 export default class AdminRepository {
-  public email: string;
-  public user: string;
-  public password: string;
+  private tableName = 'admin';
 
-  public static async add(admin: AdminRepository) {
-    return await db('admin').insert(admin);
+  public async add(admin: Admin): Promise<void> {
+    return await db(this.tableName).insert(admin);
   }
 
-  public static async findByEmail(email: string) {
-    return await db('admin').select('*').where({ email: email });
+  public async findByEmail(email: string) {
+    return await db(this.tableName).select('*').where({ email: email });
   }
 }
