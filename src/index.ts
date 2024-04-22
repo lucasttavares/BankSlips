@@ -1,5 +1,5 @@
 import express from 'express';
-import adminRouter from './routes/admin.routes';
+import adminRouter from './routes/AdminRoutes';
 import bankSlipsRouter from './routes/BankSlipsRoutes';
 import cors from 'cors';
 import 'dotenv/config';
