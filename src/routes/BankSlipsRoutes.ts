@@ -16,31 +16,37 @@ class BankSlipsRoutes {
     this.router.post(
       '/bankslips',
       AuthMiddleware.routeFilter,
-      this.bankSlipsController.postSlip,
+      (request, response) =>
+        this.bankSlipsController.postSlip(request, response),
     );
 
     this.router.get(
       '/bankslips',
       AuthMiddleware.routeFilter,
-      this.bankSlipsController.getSlips.bind(this.bankSlipsController),
+      this.bankSlipsController.getSlips,
+      /*       (request, response) =>
+        this.bankSlipsController.getSlips(request, response), */
     );
 
     this.router.get(
       '/bankslips/:id',
       AuthMiddleware.routeFilter,
-      this.bankSlipsController.getSlipsById,
+      (request, response) =>
+        this.bankSlipsController.getSlipsById(request, response),
     );
 
     this.router.post(
       '/bankslips/:id/payments',
       AuthMiddleware.routeFilter,
-      this.bankSlipsController.paySlip,
+      (request, response) =>
+        this.bankSlipsController.paySlip(request, response),
     );
 
     this.router.delete(
       '/bankslips/:id',
       AuthMiddleware.routeFilter,
-      this.bankSlipsController.cancelSlip,
+      (request, response) =>
+        this.bankSlipsController.cancelSlip(request, response),
     );
   }
 }
