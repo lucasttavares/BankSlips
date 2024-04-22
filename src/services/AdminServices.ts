@@ -1,10 +1,17 @@
 import HttpStatusCode from '../utils/enum/httpStatusCode';
 import AdminRepository from '../database/AdminRepository';
 import TokenManipulator from '../utils/tokenManipulator';
+import Admin from '../model/Admin';
 
 export default class AdminServices {
-  public static async verifyAdminCredentials(email: string, password: string) {
-    const admin: AdminRepository[] = await AdminRepository.findByEmail(email);
+  public repository: AdminRepository;
+
+  constructor() {
+    this.repository = new AdminRepository();
+  }
+
+  public async verifyAdminCredentials(email: string, password: string) {
+    const admin: Admin[] = await this.repository.findByEmail(email);
     if (admin.length === 0) {
       throw {
         status: HttpStatusCode.NOT_FOUND,

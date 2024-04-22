@@ -10,7 +10,75 @@ export default class BankSlipsServices {
     this.repository = new BankSlipsRepository();
   }
 
-  public calculate(slip: any, insertedDate: number, dueDate: number) {
+  public async save(slip: BankSlips) {
+    try {
+      if (!slip || Object.keys(slip).length === 0) {
+        throw {
+          status: HttpStatusCode.BAD_REQUEST,
+          message: { error: 'Bankslip not provided in the request body' },
+        };
+      }
+
+      const { total_in_cents, due_date, customer } = slip;
+
+      if (
+        !total_in_cents ||
+        !due_date ||
+        !customer ||
+        typeof total_in_cents !== 'number' ||
+        typeof due_date !== 'string' ||
+        typeof customer !== 'string'
+      ) {
+        throw {
+          status: HttpStatusCode.UNPROCESSABLE_ENTITY,
+          message: {
+            error:
+              'Invalid bankslip provided. The possible reasons are: A field of the provided bankslip was null or with invalid values',
+          },
+        };
+      }
+
+      const uuid = uuidv4();
+      await this.repository.add(slip, uuid);
+      return await this.repository.findById(uuid);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async findAll() {
+    try {
+      const slips = await this.repository.findAll();
+      return slips;
+    } catch (err) {
+      throw new Error(`Failed to fetch all slips: ${(err as Error).message}`);
+    }
+  }
+
+  public async pay(id: string, slip: BankSlips) {
+    try {
+      const { payment_date } = slip;
+      await this.repository.pay(id, 'PAID', payment_date);
+    } catch (err) {
+      throw {
+        status: HttpStatusCode.NOT_FOUND,
+        message: { error: 'Bankslip not found with the specified id' },
+      };
+    }
+  }
+
+  public async cancel(id: string) {
+    try {
+      await this.repository.updateStatus(id, 'CANCELED');
+    } catch (err) {
+      throw {
+        status: HttpStatusCode.BAD_REQUEST,
+        message: { error: 'Bankslip not found with the specified id' },
+      };
+    }
+  }
+
+  public calculate(slip: BankSlips, insertedDate: number, dueDate: number) {
     const epochValue = 86400000;
     const countDays = (insertedDate - dueDate) / epochValue;
     let fine = 0;
@@ -49,84 +117,12 @@ export default class BankSlipsServices {
       const fine = this.calculate(slip, fineDate, dueDate);
 
       return { ...slip, fine: fine };
-    } catch (err) {
+    } catch (error) {
       throw new Error(
         `Failed to calculate fine for slip with id ${id}: ${
-          (err as Error).message
+          (error as Error).message
         }`,
       );
-    }
-  }
-
-  public async save(slip: BankSlips) {
-    try {
-      if (!slip || Object.keys(slip).length === 0) {
-        throw {
-          status: HttpStatusCode.BAD_REQUEST,
-          message: { error: 'Bankslip not provided in the request body' },
-        };
-      }
-
-      const { total_in_cents, due_date, customer } = slip;
-
-      if (
-        !total_in_cents ||
-        !due_date ||
-        !customer ||
-        typeof total_in_cents !== 'number' ||
-        typeof due_date !== 'string' ||
-        typeof customer !== 'string'
-      ) {
-        throw {
-          status: HttpStatusCode.UNPROCESSABLE_ENTITY,
-          message: {
-            error:
-              'Invalid bankslip provided. The possible reasons are: A field of the provided bankslip was null or with invalid values',
-          },
-        };
-      }
-
-      /*       if (!slip.due_date) {
-        throw new Error('Due date is missing in the slip object.');
-      } */
-
-      const uuid = uuidv4();
-      await this.repository.add(slip, uuid);
-      return await this.repository.findById(uuid);
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  public async pay(id: string, slip: BankSlips) {
-    try {
-      const { payment_date } = slip;
-      await this.repository.pay(id, 'PAID', payment_date);
-    } catch (err) {
-      throw {
-        status: HttpStatusCode.NOT_FOUND,
-        message: { error: 'Bankslip not found with the specified id' },
-      };
-    }
-  }
-
-  public async cancel(id: string) {
-    try {
-      await this.repository.updateStatus(id, 'CANCELED');
-    } catch (err) {
-      throw {
-        status: HttpStatusCode.BAD_REQUEST,
-        message: { error: 'Bankslip not found with the specified id' },
-      };
-    }
-  }
-
-  public async findAll() {
-    try {
-      const slips = await this.repository.findAll();
-      return slips;
-    } catch (err) {
-      throw new Error(`Failed to fetch all slips: ${(err as Error).message}`);
     }
   }
 }
