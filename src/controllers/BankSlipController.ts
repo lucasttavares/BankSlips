@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import BankSlipsServices from '../services/bankSlipsServices';
+import BankSlipsServices from '../services/BankSlipsServices';
 import HttpStatusCode from '../utils/enum/httpStatusCode';
 
 export default class BankSlipController {
@@ -12,18 +12,18 @@ export default class BankSlipController {
   public async postSlip(request: Request, response: Response) {
     const slip = request.body;
     try {
-      const saved = this.bankSlipsServices.save(slip);
+      const saved = await this.bankSlipsServices.save(slip);
       return response.status(HttpStatusCode.CREATED).send(saved);
     } catch (err: any) {
       return response.status(err.status).send({ error: err.message });
     }
   }
 
-  public async getSlips(request: Request, response: Response) {
+  public getSlips = async (request: Request, response: Response) => {
     return response
       .status(HttpStatusCode.OK)
       .send(await this.bankSlipsServices.findAll());
-  }
+  };
 
   public async getSlipsById(request: Request, response: Response) {
     const id = request.params.id;
