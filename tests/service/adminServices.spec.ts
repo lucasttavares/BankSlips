@@ -1,12 +1,30 @@
 import AdminRepository from '../../src/database/AdminRepository';
-import AdminServices from '../../src/services/adminServices';
+import AdminServices from '../../src/services/AdminServices';
 import TokenManipulator from '../../src/utils/tokenManipulator';
 
-jest.mock('../model/dao/adminDao');
-jest.mock('../utils/tokenManipulator');
+let repository: AdminRepository;
+let services: AdminServices;
 
-describe('Auth Controller', () => {
+jest.mock('../../src/database/AdminRepository', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    findByEmail: jest.fn().mockReturnThis(),
+  }),
+}));
+
+jest.mock('../../src/services/AdminServices', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    verifyAdminCredentials: jest.fn().mockReturnThis(),
+  }),
+}));
+
+jest.mock('../../src/utils/tokenManipulator');
+
+describe('Admin Service', () => {
   beforeEach(() => {
+    repository = new AdminRepository();
+    services = new AdminServices();
     jest.clearAllMocks();
   });
 
@@ -15,21 +33,22 @@ describe('Auth Controller', () => {
     const adminPassword = 'adminPassword';
     const adminData = { email: adminEmail, password: adminPassword };
 
-    AdminRepository.findByEmail = jest.fn().mockResolvedValue([adminData]);
+    jest.spyOn(repository, 'findByEmail').mockResolvedValue([adminData.email]);
 
-    const token = await AdminServices.verifyAdminCredentials(
+    const token = await services.verifyAdminCredentials(
       adminEmail,
       adminPassword,
     );
-    expect(AdminRepository.findByEmail).toHaveBeenCalledTimes(1);
+
+    expect(repository.findByEmail).toHaveBeenCalledTimes(1);
     expect(TokenManipulator.generateToken).toHaveBeenCalledTimes(1);
     expect(token).toHaveProperty('token');
   });
 
   test('Verify Admin Credentials Error Admin not found', async () => {
-    AdminRepository.findByEmail = jest.fn().mockResolvedValue([]);
+    repository.findByEmail = jest.fn().mockResolvedValue([]);
     try {
-      await AdminServices.verifyAdminCredentials('test@test.com', 'test');
+      await services.verifyAdminCredentials('test@test.com', 'test');
     } catch (error: any) {
       expect(error.status).toBe(404);
       expect(error.message).toEqual({ error: 'Admin not found' });
@@ -38,12 +57,13 @@ describe('Auth Controller', () => {
 
   test('Verify Admin Credentials Error Invalid password', async () => {
     const adminEmail = 'admin@example.com';
-    AdminRepository.findByEmail = jest
+
+    repository.findByEmail = jest
       .fn()
       .mockResolvedValue([{ email: adminEmail, password: 'correctPassword' }]);
 
     try {
-      await AdminServices.verifyAdminCredentials(adminEmail, 'invalidPassword');
+      await services.verifyAdminCredentials(adminEmail, 'invalidPassword');
     } catch (error: any) {
       expect(error.status).toBe(400);
       expect(error.message).toEqual({ error: 'Invalid password' });

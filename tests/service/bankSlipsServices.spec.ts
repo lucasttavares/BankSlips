@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import BankSlipsRepository from '../../src/database/BankSlipsRepository';
-import BankSlipsServices from '../../src/services/bankSlipsServices';
+import BankSlipsServices from '../../src/services/BankSlipsServices';
 
-jest.mock('../model/dao/bankSlipsDao');
+jest.mock('../../src/database/BankSlipsRepository');
 jest.mock('uuid', () => ({
   v4: jest.fn(),
 }));

@@ -1,7 +1,7 @@
 import AuthMiddleware from '../../src/middlewares/authMiddleware';
 import TokenManipulator from '../../src/utils/tokenManipulator';
 
-jest.mock('../utils/tokenManipulator', () => ({
+jest.mock('../../src/utils/tokenManipulator', () => ({
   validateToken: jest.fn(),
 }));
 

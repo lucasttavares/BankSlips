@@ -1,13 +1,32 @@
-import BankSlipController from '../src/controllers/bankSlipsController';
-import BankSlips from '../src/model/BankSlips';
-import BankSlipsServices from '../src/services/bankSlipsServices';
+import BankSlipController from '../../src/controllers/BankSlipController';
+import BankSlipsRepository from '../../src/database/BankSlipsRepository';
+import BankSlipsServices from '../../src/services/BankSlipsServices';
 
-jest.mock('../model/dao/bankSlipsDao');
-jest.mock('../services/bankSlipsServices');
-jest.mock('../services/fineCaulculatorServices');
+let repository: BankSlipsRepository;
+let services: BankSlipsServices;
+
+jest.mock('../../src/database/BankSlipsRepository', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    findAll: jest.fn().mockReturnThis(),
+  }),
+}));
+
+jest.mock('../../src/services/BankSlipsServices', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    findAll: jest.fn().mockReturnThis(),
+    save: jest.fn().mockReturnThis(),
+    fineCalculator: jest.fn().mockReturnThis(),
+    pay: jest.fn().mockReturnThis(),
+    cancel: jest.fn().mockReturnThis(),
+  }),
+}));
 
 describe('BankSlip Controller', () => {
   beforeEach(() => {
+    repository = new BankSlipsRepository();
+    services = new BankSlipsServices();
     jest.clearAllMocks();
   });
 
@@ -23,10 +42,14 @@ describe('BankSlip Controller', () => {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     };
-    await BankSlipController.postSlip(request, response);
 
-    expect(BankSlipsServices.save).toHaveBeenCalledTimes(1);
-    expect(BankSlipsServices.save).toHaveBeenCalledWith({
+    const slipController = new BankSlipController();
+    jest.spyOn(services, 'save').mockResolvedValue(request);
+
+    await slipController.postSlip(request, response);
+
+    expect(services.save).toHaveBeenCalledTimes(1);
+    expect(services.save).toHaveBeenCalledWith({
       due_date: '2023-12-01',
       total_in_cents: 100,
       customer: 'test',
@@ -42,7 +65,8 @@ describe('BankSlip Controller', () => {
     };
 
     try {
-      await BankSlipController.postSlip(request, response);
+      const slipController = new BankSlipController();
+      await slipController.postSlip(request, response);
     } catch (err) {
       expect(response.status).toHaveBeenCalledWith(400);
       expect(response.send).toHaveBeenCalledWith(
@@ -65,7 +89,8 @@ describe('BankSlip Controller', () => {
     };
 
     try {
-      await BankSlipController.postSlip(request, response);
+      const slipController = new BankSlipController();
+      await slipController.postSlip(request, response);
     } catch (err) {
       expect(response.status).toHaveBeenCalledWith(422);
       expect(response.send).toHaveBeenCalledWith(
@@ -74,15 +99,19 @@ describe('BankSlip Controller', () => {
     }
   });
 
-  test('GET Slip', async () => {
+  test('GET Slips', async () => {
     const request: any = {};
     const response: any = {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     };
-    await BankSlipController.getSlips(request, response);
 
-    expect(BankSlips.findAll).toHaveBeenCalledTimes(1);
+    const slipController = new BankSlipController();
+    jest.spyOn(services, 'findAll').mockResolvedValue(request);
+
+    await slipController.getSlips(request, response);
+
+    expect(services.findAll).toHaveBeenCalledTimes(1);
     expect(response.status).toHaveBeenCalledWith(200);
   });
 
@@ -94,9 +123,13 @@ describe('BankSlip Controller', () => {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     };
-    await BankSlipController.getSlipsById(request, response);
 
-    expect(BankSlipsServices.fineCalculator).toHaveBeenCalledTimes(1);
+    const slipController = new BankSlipController();
+    jest.spyOn(services, 'fineCalculator').mockResolvedValue(request);
+
+    await slipController.getSlipsById(request, response);
+
+    expect(services.fineCalculator).toHaveBeenCalledTimes(1);
     expect(response.status).toHaveBeenCalledWith(200);
   });
 
@@ -109,7 +142,8 @@ describe('BankSlip Controller', () => {
       send: jest.fn(),
     };
     try {
-      await BankSlipController.getSlipsById(request, response);
+      const slipController = new BankSlipController();
+      await slipController.getSlipsById(request, response);
     } catch (err) {
       expect(response.status).toHaveBeenCalledWith(404);
       expect(response.send).toHaveBeenCalledWith(
@@ -127,10 +161,14 @@ describe('BankSlip Controller', () => {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     };
-    await BankSlipController.paySlip(request, response);
 
-    expect(BankSlipsServices.pay).toHaveBeenCalledTimes(1);
-    expect(BankSlipsServices.pay).toHaveBeenCalledWith('test', {
+    const slipController = new BankSlipController();
+    jest.spyOn(services, 'pay').mockResolvedValue(request);
+
+    await slipController.paySlip(request, response);
+
+    expect(services.pay).toHaveBeenCalledTimes(1);
+    expect(services.pay).toHaveBeenCalledWith('test', {
       payment_date: '2023-12-01',
     });
     expect(response.status).toHaveBeenCalledWith(204);
@@ -146,7 +184,8 @@ describe('BankSlip Controller', () => {
       send: jest.fn(),
     };
     try {
-      await BankSlipController.paySlip(request, response);
+      const slipController = new BankSlipController();
+      await slipController.paySlip(request, response);
     } catch (err) {
       expect(response.status).toHaveBeenCalledWith(404);
       expect(response.send).toHaveBeenCalledWith(
@@ -164,9 +203,12 @@ describe('BankSlip Controller', () => {
       send: jest.fn(),
     };
 
-    await BankSlipController.cancelSlip(request, response);
+    const slipController = new BankSlipController();
+    jest.spyOn(services, 'findAll').mockResolvedValue(request);
 
-    expect(BankSlipsServices.cancel).toHaveBeenCalledTimes(1);
+    await slipController.cancelSlip(request, response);
+
+    expect(services.cancel).toHaveBeenCalledTimes(1);
     expect(response.status).toHaveBeenCalledWith(200);
   });
 
@@ -179,7 +221,8 @@ describe('BankSlip Controller', () => {
       send: jest.fn(),
     };
     try {
-      await BankSlipController.cancelSlip(request, response);
+      const slipController = new BankSlipController();
+      await slipController.cancelSlip(request, response);
     } catch (err) {
       expect(response.status).toHaveBeenCalledWith(400);
       expect(response.send).toHaveBeenCalledWith(
