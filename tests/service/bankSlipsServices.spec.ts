@@ -2,13 +2,25 @@ import { v4 as uuidv4 } from 'uuid';
 import BankSlipsRepository from '../../src/database/BankSlipsRepository';
 import BankSlipsServices from '../../src/services/BankSlipsServices';
 
-jest.mock('../../src/database/BankSlipsRepository');
+let repository: BankSlipsRepository;
+
+jest.mock('../../src/database/BankSlipsRepository', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    add: jest.fn().mockReturnThis(),
+    findById: jest.fn().mockReturnThis(),
+    pay: jest.fn().mockReturnThis(),
+    updateStatus: jest.fn().mockReturnThis(),
+  }),
+}));
+
 jest.mock('uuid', () => ({
   v4: jest.fn(),
 }));
 
 describe('BankSlips Services', () => {
   beforeEach(() => {
+    repository = new BankSlipsRepository();
     jest.clearAllMocks();
   });
 
@@ -22,10 +34,8 @@ describe('BankSlips Services', () => {
     const id = '7954f4b0-7ce9-424e-93fd-83c71eea3bc7';
     (uuidv4 as jest.Mock).mockReturnValueOnce(id);
 
-    const slipService = new BankSlipsServices();
-    await slipService.save(slip);
-
-    const repository = new BankSlipsRepository();
+    const service = new BankSlipsServices();
+    await service.save(slip);
 
     expect(repository.add).toHaveBeenCalledTimes(1);
     expect(repository.add).toHaveBeenCalledWith(slip, id);
@@ -36,8 +46,8 @@ describe('BankSlips Services', () => {
     const slip: any = {};
 
     try {
-      const slipService = new BankSlipsServices();
-      await slipService.save(slip);
+      const service = new BankSlipsServices();
+      await service.save(slip);
     } catch (error: any) {
       expect(error.status).toBe(400);
       expect(error.message).toEqual({
@@ -54,8 +64,8 @@ describe('BankSlips Services', () => {
     };
 
     try {
-      const slipService = new BankSlipsServices();
-      await slipService.save(slip);
+      const service = new BankSlipsServices();
+      await service.save(slip);
     } catch (error: any) {
       expect(error.status).toBe(422);
       expect(error.message).toEqual({
@@ -71,24 +81,21 @@ describe('BankSlips Services', () => {
       payment_date: '2024-02-10',
     };
 
-    const slipService = new BankSlipsServices();
-    const result = await slipService.pay(id, slip);
+    const service = new BankSlipsServices();
+    await service.pay(id, slip);
 
-    expect(slipService.pay).toHaveBeenCalledTimes(1);
-    expect(slipService.pay).toHaveBeenCalledWith(id, 'PAID', slip.payment_date);
-    expect(result).toBe(true);
+    expect(repository.pay).toHaveBeenCalledTimes(1);
+    expect(repository.pay).toHaveBeenCalledWith(id, 'PAID', slip.payment_date);
   });
 
   test('Pay Slip Error not found', async () => {
     const id = '';
     const slip: any = {};
 
-    const slipService = new BankSlipsServices();
-
-    (slipService.pay as jest.Mock).mockResolvedValueOnce(0);
+    const service = new BankSlipsServices();
 
     try {
-      await slipService.pay(id, slip);
+      await service.pay(id, slip);
     } catch (error: any) {
       expect(error.status).toBe(404);
       expect(error.message).toEqual({
@@ -100,20 +107,21 @@ describe('BankSlips Services', () => {
   test('Cancel Slip', async () => {
     const id = '7954f4b0-7ce9-424e-93fd-83c71eea3bc7';
 
-    const slipService = new BankSlipsServices();
+    const service = new BankSlipsServices();
+    await service.cancel(id);
 
-    expect(slipService.cancel).toHaveBeenCalledTimes(1);
-    expect(slipService.cancel).toHaveBeenCalledWith(id, 'CANCELED');
+    expect(repository.updateStatus).toHaveBeenCalledTimes(1);
+    expect(repository.updateStatus).toHaveBeenCalledWith(id, 'CANCELED');
   });
 
   test('Cancel Slip Error not found', async () => {
     const id = '';
 
-    const slipService = new BankSlipsServices();
-    (slipService.cancel as jest.Mock).mockResolvedValueOnce(0);
+    const service = new BankSlipsServices();
+    await service.cancel(id);
 
     try {
-      await slipService.cancel(id);
+      await service.cancel(id);
     } catch (error: any) {
       expect(error.status).toBe(400);
       expect(error.message).toEqual({
