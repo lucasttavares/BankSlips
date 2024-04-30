@@ -8,7 +8,7 @@ export default class AdminRepository {
     return await db(this.tableName).insert(admin);
   }
 
-  public async findByEmail(email: string) {
+  public async findByEmail(email: string): Promise<Admin[]> {
     return await db(this.tableName).select('*').where({ email: email });
   }
 }
