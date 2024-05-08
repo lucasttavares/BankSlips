@@ -4,7 +4,7 @@
 <img src="https://img.shields.io/badge/Knex.js-%23FF9900.svg?style=for-the-badge&logoColor=white"/><img src="https://img.shields.io/badge/Jest-323330?style=for-the-badge&logoColor=white"/>
 <img src="https://img.shields.io/badge/Swagger-%2FFFF.svg?style=for-the-badge&logoColor=white"/>
 
-Este projeto consiste em uma API REST responsável por gerar e gerenciar boletos, visando execução de cinco endpoints:
+Este projeto consiste em uma API REST responsável por gerar e gerenciar boletos, visando execução dos seguintes endpoints:
 
 - Registrar administrador - `POST` localhost:8080/admin/register
 - Autenticar administrador - `POST` localhost:8080/admin/auth
