@@ -22,7 +22,7 @@ class BankSlipsRoutes {
 
     this.router.get(
       '/bankslips',
-      AuthMiddleware.routeFilter,
+      // AuthMiddleware.routeFilter,
       this.bankSlipsController.getSlips,
       /*       (request, response) =>
         this.bankSlipsController.getSlips(request, response), */
