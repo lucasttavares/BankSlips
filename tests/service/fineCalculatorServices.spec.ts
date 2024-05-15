@@ -121,9 +121,10 @@ describe('Fine Calculator', () => {
       await service.fineCalculator(id);
     } catch (error: any) {
       expect(repository.findById).toHaveBeenCalledTimes(1);
-      expect(error.message).toEqual(
-        'Failed to calculate fine for slip with id : Bankslip not found with the specified id: ',
-      );
+      expect(error.message).toEqual({
+        error:
+          'Failed to calculate fine for slip with id : Bankslip not found with the specified id: ',
+      });
     }
   });
 });
