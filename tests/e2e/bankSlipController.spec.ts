@@ -15,7 +15,7 @@ describe('BanlSlip Controller', () => {
 
     const loginResponse = await request(app)
       .post('/admin/auth')
-      .send({ email: 'test@test.com', password: '123' })
+      .send({ email: 'newadmintest@test.com', password: '123' })
       .expect(HttpStatusCode.OK);
 
     token = loginResponse.body.token;
