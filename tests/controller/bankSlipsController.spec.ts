@@ -209,7 +209,7 @@ describe('BankSlip Controller', () => {
     await slipController.cancelSlip(request, response);
 
     expect(services.cancel).toHaveBeenCalledTimes(1);
-    expect(response.status).toHaveBeenCalledWith(200);
+    expect(response.status).toHaveBeenCalledWith(204);
   });
 
   test('Pay Slip Error 404', async () => {
