@@ -91,7 +91,7 @@ DB_PORT=3306
 }
 ```
 
-## Dokcer
+## Docker
 
 A imagem Docker do `MySQL` pode ser instalada manualmente através do comando `docker pull mysql`.
 
