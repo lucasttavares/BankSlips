@@ -13,6 +13,4 @@ app.use('/rest', bankSlipsRouter);
 app.use(cors());
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server rodando na porta ${process.env.PORT}`);
-});
+export { app };

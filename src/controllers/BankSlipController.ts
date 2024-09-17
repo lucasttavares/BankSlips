@@ -15,7 +15,7 @@ export default class BankSlipController {
       const saved = await this.bankSlipsServices.save(slip);
       return response.status(HttpStatusCode.CREATED).send(saved);
     } catch (err: any) {
-      return response.status(err.status).send({ error: err.message });
+      return response.status(err.status).send(err.message);
     }
   }
 
@@ -31,10 +31,8 @@ export default class BankSlipController {
       return response
         .status(HttpStatusCode.OK)
         .send(await this.bankSlipsServices.fineCalculator(id));
-    } catch (err) {
-      return response
-        .status(HttpStatusCode.NOT_FOUND)
-        .send('Bankslip not found with the specified id');
+    } catch (err: any) {
+      return response.status(HttpStatusCode.NOT_FOUND).send(err.message);
     }
   }
 
@@ -43,7 +41,7 @@ export default class BankSlipController {
     const slip = request.body;
 
     try {
-      this.bankSlipsServices.pay(id, slip);
+      await this.bankSlipsServices.pay(id, slip);
       return response.status(HttpStatusCode.NO_CONTENT).send();
     } catch (err: any) {
       return response.status(err.status).send(err.message);
@@ -53,9 +51,8 @@ export default class BankSlipController {
   public async cancelSlip(request: Request, response: Response) {
     const id = request.params.id;
     try {
-      return response
-        .status(HttpStatusCode.OK)
-        .send(await this.bankSlipsServices.cancel(id));
+      await this.bankSlipsServices.cancel(id);
+      return response.status(HttpStatusCode.NO_CONTENT).send();
     } catch (err: any) {
       return response.status(err.status).send(err.message);
     }

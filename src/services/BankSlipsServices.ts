@@ -56,26 +56,28 @@ export default class BankSlipsServices {
   }
 
   public async pay(id: string, slip: BankSlips) {
-    try {
-      const { payment_date } = slip;
-      await this.repository.pay(id, 'PAID', payment_date);
-    } catch (err) {
+    const slipExists = await this.repository.findById(id);
+    const { payment_date } = slip;
+
+    if (!slipExists) {
       throw {
         status: HttpStatusCode.NOT_FOUND,
         message: { error: 'Bankslip not found with the specified id' },
       };
     }
+    return await this.repository.pay(id, 'PAID', payment_date);
   }
 
   public async cancel(id: string) {
-    try {
-      await this.repository.updateStatus(id, 'CANCELED');
-    } catch (err) {
+    const slipExists = await this.repository.findById(id);
+
+    if (!slipExists) {
       throw {
-        status: HttpStatusCode.BAD_REQUEST,
+        status: HttpStatusCode.NOT_FOUND,
         message: { error: 'Bankslip not found with the specified id' },
       };
     }
+    return await this.repository.updateStatus(id, 'CANCELED');
   }
 
   public calculate(slip: BankSlips, insertedDate: number, dueDate: number) {
@@ -118,11 +120,13 @@ export default class BankSlipsServices {
 
       return { ...slip, fine: fine };
     } catch (error) {
-      throw new Error(
-        `Failed to calculate fine for slip with id ${id}: ${
-          (error as Error).message
-        }`,
-      );
+      throw {
+        message: {
+          error: `Failed to calculate fine for slip with id ${id}: ${
+            (error as Error).message
+          }`,
+        },
+      };
     }
   }
 }

@@ -3,7 +3,7 @@ import 'dotenv/config';
 // Update with your config settings.
 
 const config = {
-  client: 'mysql2',
+  /*   client: 'mysql2',
   useNullAsDefault: true,
   connection: {
     host: process.env.DB_HOST,
@@ -15,6 +15,34 @@ const config = {
   migrations: {
     directory: './migrations',
     extension: 'ts',
+  }, */
+
+  development: {
+    client: 'mysql2',
+    useNullAsDefault: true,
+    connection: {
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    },
+    migrations: {
+      directory: './migrations',
+      extension: 'ts',
+    },
+  },
+
+  test: {
+    client: 'sqlite3',
+    connection: {
+      filename: './test.sqlite3',
+    },
+    useNullAsDefault: true,
+    migrations: {
+      directory: './migrations',
+      extension: 'ts',
+    },
   },
 
   /*  staging: {
